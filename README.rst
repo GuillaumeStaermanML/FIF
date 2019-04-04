@@ -19,13 +19,11 @@ These are the dependencies to use Picard:
 
 * numpy 
 * matplotlib 
-* math 
 
 Cite
 ----
 
 If you use this code in your project, please cite::
-
 
 
    Guillaume Staerman, Pavlo Mozharovskyi, Stéphan Clémençon, Florence d'Alché-Buc. 
