@@ -24,19 +24,12 @@ These are the dependencies to use Picard:
 Cite
 ----
 
-If you use this code in your project, please cite:
+If you use this code in your project, please cite::
 
-```
-@ARTICLE{Staerman,
-   author = {{Staerman}, G. and {Mozharovskyi}, P. and {Cl\'{e}mençon}, S. and {d'Alch\'{e}-Buc, F.}},
-    title = "{Functional Isolation Forest}",
-  journal = {ArXiv e-prints},
-archivePrefix = "arXiv",
-   eprint = {},
- keywords = {Functional data analysis-unsupervised anomaly detection},
-     year = 2019,
-    month = april,
-   adsurl = {,
-  adsnote = {}
-}
-```   
+
+
+   Guillaume Staerman, Pavlo Mozharovskyi, Stéphan Clémençon, Florence d'Alché-Buc. 
+   Functional Isolation Forest
+   ArXiv e-prints (submitted), 2019.
+
+  
