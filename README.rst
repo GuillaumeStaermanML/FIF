@@ -13,7 +13,7 @@ Installation
 To install the package, the simplest way is to use pip to get the latest release::
 
   $ pip install FIF 
-  $or pip install MFIF (for the multivariate version)
+  $ pip install MFIF (for the multivariate version)
 
 or to get the latest version of the code::
 
