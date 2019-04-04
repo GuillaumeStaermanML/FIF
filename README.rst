@@ -7,7 +7,17 @@ This repository hosts Python code of the Functional Isolation Forest algorithms 
 =========================================
 
 
+Installation
+------------
 
+To install the package, the simplest way is to use pip to get the latest release::
+
+  $ pip install FIF 
+  $or pip install MFIF (for the multivariate version)
+
+or to get the latest version of the code::
+
+  $ pip install git+https://github.com/Gstaerman/FIF.git
 
 
 
