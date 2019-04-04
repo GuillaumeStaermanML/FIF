@@ -26,7 +26,7 @@ Cite
 
 If you use this code in your project, please cite::
 
-```
+
 @ARTICLE{Staerman,
    author = {{Staerman}, G. and {Mozharovskyi}, P. and {Cl\'{e}mençon}, S. and {d'Alch\'{e}-Buc, F.}},
     title = "{Functional Isolation Forest}",
@@ -39,4 +39,4 @@ archivePrefix = "arXiv",
    adsurl = {,
   adsnote = {}
 }
-```    
+   
