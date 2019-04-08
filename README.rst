@@ -36,9 +36,8 @@ Cite
 
 If you use this code in your project, please cite::
 
-
-   Guillaume Staerman, Pavlo Mozharovskyi, Stéphan Clémençon, Florence d'Alché-Buc. 
-   Functional Isolation Forest
+   Functional Isolation Forest   
+   Guillaume Staerman, Pavlo Mozharovskyi, Stéphan Clémençon, Florence d'Alché-Buc.   
    ArXiv e-prints (submitted), 2019.
 
   
