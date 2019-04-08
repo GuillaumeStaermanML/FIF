@@ -12,7 +12,7 @@ Installation
 
 To get the latest version of the code::
 
-  $ pip install git+https://github.com/Gstaerman/FIF.git
+  $ git clone https://github.com/Gstaerman/FIF.git
 
 
 
