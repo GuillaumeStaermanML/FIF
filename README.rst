@@ -26,7 +26,7 @@ or to get the latest version of the code::
 Dependencies
 ------------
 
-These are the dependencies to use Picard:
+These are the dependencies to use FIF:
 
 * numpy 
 * matplotlib 
