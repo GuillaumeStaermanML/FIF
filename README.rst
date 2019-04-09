@@ -52,7 +52,7 @@ And then use FIF to ranking functional dataset :
     
 S2 is the score of all functions in the dataset.
 
-%.. image:: derive2_deux.pdf
+.. image:: derive2_deux.pdf
 
 Dependencies
 ------------
