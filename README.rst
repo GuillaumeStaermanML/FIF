@@ -47,10 +47,13 @@ And then use FIF to ranking functional dataset :
 
 .. code:: python
 
+   F1  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=1)
+   S1  = F1.compute_paths()
    F2  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=0)
    S2  = F2.compute_paths()
     
-S2 is the score of all functions in the dataset.
+S1 and S2 are the score of all functions in the dataset. S1 come from FIF with $L_2$ scalar product while
+S2 come from FIF with $L_2$ derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
 
 .. image:: derive2.png
 
