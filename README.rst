@@ -19,6 +19,13 @@ Algorithm
 Functional Isolation Forest is an anomaly detection (and anomaly ranking) algorithm for functional data.
 It shows a great flexibility to distinguish most of anomaly types of functional data.
 
+Some parameters have to be set by the user : 
+                                    - innerproduct (one can fix 'auto' and vary alpha parameter to play with FIF) 
+                                    - D (Dictionary)
+                                    - time (vector time of discretization points) 
+                                    
+See the documentation of FIF.py to get more informations on innerproduct and dictionary possibilities.                                 
+
 Quick Start :
 ------------
 
@@ -52,8 +59,8 @@ And then use FIF to ranking functional dataset :
    F2  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=0)
    S2  = F2.compute_paths()
     
-S1 and S2 are the score of all functions in the dataset. S1 come from FIF with $L_2$ scalar product while
-S2 come from FIF with $L_2$ derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
+S1 and S2 are the score of all functions in the dataset. S1 come from FIF with L2 scalar product while
+S2 come from FIF with L2 derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
 
 .. image:: derive2.png
 
