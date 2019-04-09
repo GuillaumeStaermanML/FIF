@@ -42,9 +42,15 @@ Quick Start :
    Y[:,0] = 0
    Y[:,m-1] = 0
    Z = np.concatenate((X,Y), axis = 0)
+   
+And then use FIF to ranking functional dataset :
 
+.. code:: python
 
+   F2  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=0)
+   S2  = F2.compute_paths()
     
+S2 is the score of all functions in the dataset.
 
 %.. image:: derive2_deux.pdf
 
