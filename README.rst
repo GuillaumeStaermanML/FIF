@@ -23,24 +23,25 @@ Quick Start :
 ------------
 
 .. code:: python
-    
-m =100
-n =100
-tps = np.linspace(0,1,m)
-v = np.linspace(1,1.4,n)
-X = np.zeros((n,m))
-Y = np.zeros((10,m))
-for i in range(n):
-    X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
-for i in range(10):
-    for j in range(m):
-        if (tps[j]<0.2 or tps[j]>0.8):
-            Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 
-        else:
-            Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.random.normal(0,0.3,1)
-Y[:,0] = 0
-Y[:,m-1] = 0
-Z = np.concatenate((X,Y), axis = 0)
+   
+   >>> import numpy as np
+       m =100
+       n =100
+       tps = np.linspace(0,1,m)
+       v = np.linspace(1,1.4,n)
+       X = np.zeros((n,m))
+       Y = np.zeros((10,m))
+       for i in range(n):
+       X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
+       for i in range(10):
+           for j in range(m):
+               if (tps[j]<0.2 or tps[j]>0.8):
+                   Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 
+               else:
+                   Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.random.normal(0,0.3,1)
+       Y[:,0] = 0
+       Y[:,m-1] = 0
+       Z = np.concatenate((X,Y), axis = 0)
 
 
     
