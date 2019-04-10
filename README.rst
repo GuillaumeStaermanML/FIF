@@ -70,7 +70,7 @@ Dependencies
 These are the dependencies to use FIF:
 
 * numpy 
-* matplotlib 
+
 
 Cite
 ----
