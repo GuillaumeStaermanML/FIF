@@ -29,7 +29,7 @@ See the documentation of FIF.py to get more informations on innerproduct and dic
 Quick Start :
 ------------
 
-Create toy dataset :
+Create a toy dataset :
 
 .. code:: python
    
