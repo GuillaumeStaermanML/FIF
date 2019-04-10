@@ -29,6 +29,8 @@ See the documentation of FIF.py to get more informations on innerproduct and dic
 Quick Start :
 ------------
 
+Create toy dataset :
+
 .. code:: python
    
    import numpy as np
