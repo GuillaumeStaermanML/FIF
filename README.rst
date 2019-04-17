@@ -41,7 +41,7 @@ Create a toy dataset :
    X = np.zeros((n,m))
    Y = np.zeros((10,m))
    for i in range(n):
-   X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
+       X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
    for i in range(10):
        for j in range(m):
            if (tps[j]<0.2 or tps[j]>0.8):
