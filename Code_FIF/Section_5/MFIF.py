@@ -377,6 +377,7 @@ class MFIForest(object):
                     self.deriv_D = np.zeros((self.D.shape[0], self.D.shape[1],self.D.shape[2]-1))
                     for i in range(X.shape[0]):
                         self.deriv_X[i] = derivateM(self.X[i], self.step)
+                    for i in range(self.D.shape[0]):
                         self.deriv_D[i] = derivateM(self.D[i], self.step)
 
                     def innerproduct(x,y, xderiv, yderiv):
