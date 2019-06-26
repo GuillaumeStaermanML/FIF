@@ -156,6 +156,7 @@ class FIForest(object):
                  D,
                  time,
                  innerproduct,
+                 criterion="naive",
                  ntrees=None,
                  subsample_size=None, 
                  Dsize=None, 
@@ -171,13 +172,15 @@ class FIForest(object):
         self.nobjs = len(X)
         self.Trees = []
         self.time = time
+        self.criterion = criterion
+
 
         if (ntrees == None):
             self.ntrees = 100
         else: self.ntrees = ntrees
 
         if (subsample_size == None):
-            if (len(X)>500):
+            if (self.nobjs > 500):
                 self.sample = 256
             else: self.sample = 64
         else : self.sample = subsample_size
@@ -432,6 +435,7 @@ class FIForest(object):
         self.limit = limit
         self.c = c_factor(self.sample)
 
+
         if limit is None:
             """Set limit to the default as specified by the original paper
             (average depth of unsuccesful search through a binary tree).
@@ -451,7 +455,7 @@ class FIForest(object):
                                         0, self.limit, 
                                         self.D, self.innerproduct, 
                                         self.alpha, self.deriv_X, 
-                                        self.deriv_dictionary))
+                                        self.deriv_dictionary, self.sample, self.criterion))
         else:
             for i in range(self.ntrees): 
                 """This loop builds an ensemble of iTrees (the forest).
@@ -462,7 +466,7 @@ class FIForest(object):
                                         0, self.limit, 
                                         self.D, self.innerproduct, 
                                         self.alpha, self.deriv_X[ix], 
-                                        self.deriv_dictionary))
+                                        self.deriv_dictionary, self.sample, self.criterion))
 
 
     def compute_paths(self, X_in = None):
@@ -552,6 +556,17 @@ class FIForest(object):
         """
         y_label = np.zeros((len(score)))
         return 1- 2.0 * (score > self.threshold(score, contamination))
+
+    def importance_feature(self):
+        IF = np.zeros((self.D.shape[0]))
+
+        
+        for i in range(self.ntrees):
+            IF += self.Trees[i].IF
+    
+
+        return IF
+
 
 
 class Node(object): 
@@ -675,7 +690,9 @@ class iTree(object):
                  innerproduct, 
                  alpha, 
                  deriv_X=None, 
-                 deriv_dictionary=None):
+                 deriv_dictionary=None,
+                 subsample_size=None,
+                 criterion=None):
         
         self.e = e
         self.X = X
@@ -692,8 +709,13 @@ class iTree(object):
         self.alpha = alpha
         self.deriv_X = deriv_X
         self.deriv_dictionary = deriv_dictionary
+        self.IF = np.zeros((self.D.shape[0])) 
+        self.subsample_size = subsample_size
+        self.criterion = criterion
         # At each node create a new tree, starting with root node.
-        self.root = self.make_tree(self.X, self.e) 
+        self.root = self.make_tree(self.X, self.e)
+        
+
 
     def make_tree(self, X, e):
         """
@@ -721,7 +743,8 @@ class iTree(object):
             return Node(X, self.d, self.dd, self.q, e, left, right, node_type = 'exNode')
         
         # Building the tree continues. All these nodes are internal.
-        else:                                                                   
+        else:     
+                                                                         
             sample_size = X.shape[0] 
             idx = np.random.choice(np.arange((self.D).shape[0]), size=1)
             self.d = self.D[idx[0],:]
@@ -741,7 +764,19 @@ class iTree(object):
             #print(np.min(Z))
             self.q = np.random.uniform(np.min(Z), np.max(Z)) 
             # Criteria that determines if a curve should go to the left or right child node.
-            w = Z - self.q < 0                                                    
+            w = Z - self.q < 0
+            
+            if (sample_size >2):
+                if (np.sum(w) == 1 or np.sum(w) == sample_size - 1): 
+                    if (self.criterion == "naive"):
+                        self.IF[idx[0]] += 1
+                    elif(self.criterion == "sample"):
+                        self.IF[idx[0]] += sample_size / self.subsample_size 
+
+                    else:
+                        self.IF[idx[0]] += 1 / (e + 1) 
+
+
             return Node(self.X, self.d, self.dd, self.q, e,\
             left=self.make_tree(X[w], e+1),\
             right=self.make_tree(X[~w], e+1),\
