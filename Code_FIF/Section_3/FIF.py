@@ -44,18 +44,18 @@ import numpy as np
 
 def derivate(X, step):
     """Compute de derivative of each function in the matrix X w.r.t vector time."""
-    step = step.astype(dtype = float)
-    A = np.zeros((X.shape[0],X.shape[1]-1))
+    step = step.astype(dtype=float)
+    A = np.zeros((X.shape[0], X.shape[1] - 1))
     for i in range(X.shape[0]):
         A[i] = np.diff(X[i]) / step
     return A
 def derivate_piecewise(X, step):
     """Compute de derivative of each piecewise function in the matrix X w.r.t vector time."""
-    A = np.zeros((X.shape[0],X.shape[1]-1))
+    A = np.zeros((X.shape[0], X.shape[1] - 1))
     for i in range(X.shape[0]):
         a = np.where(X[i] != 0)[0]
-        b = a[0:(a.shape[0]-1)]
-        A[i,b] = np.diff(X[i,a]) / step[b]
+        b = a[0 : (a.shape[0] - 1)]
+        A[i, b] = np.diff(X[i,a]) / step[b]
     return A
     
 def c_factor(n_samples_leaf) :
@@ -163,9 +163,7 @@ class FIForest(object):
                  limit=None, 
                  mean=None, 
                  sd=None, 
-                 J_max=None, 
-                 amplitude_min=None, 
-                 amplitude_max=None, 
+                 J_max=None,  
                  alpha=None):
       
         self.X = X
@@ -173,6 +171,9 @@ class FIForest(object):
         self.Trees = []
         self.time = time
         self.criterion = criterion
+        self.mean = mean
+        self.sd = sd
+        self.D = D
 
 
         if (ntrees == None):
@@ -192,55 +193,10 @@ class FIForest(object):
         
 
         if (type(D) == str):
-            """Some dictionary pre-implemented.
+            """Finite dictionaries are pre-implemented.
             """ 
-            
-                    
-            if (D == 'Brownian'):
-                """ We build a dictionary from brownian motion (standard or drift).
-                We use a discretization on [0,1] since we are interested only by the shape
-                of curves.
-                """
-                if (mean == None):
-                    mean = 0
-                
-                if (sd == None):
-                    sd = 1
-                    
-                self.D = np.zeros((self.Dsize,len(self.time)))
-                t = np.linspace(0, 1, len(self.time))
-                self.D[:,0] = np.random.normal(mean, scale = sd , size = self.Dsize) 
-                for i in range(1,np.size(self.time)):
-                    self.D[:,i] = self.D[:, i-1] + sd * np.random.normal(0, scale = np.sqrt(t[2] - t[1])
-                                                                , size = self.Dsize) + mean * (t[2] - t[1]) 
-
-            elif (D == 'Brownian_bridge'):
-                """ We build a dictionary from Brownian bridge.
-                """
-                    
-                self.D = np.zeros((self.Dsize,len(self.time)))
-                t = np.linspace(0, 1, len(self.time))
-                for i in range(1,(len(self.time)-1)):
-                    self.D[:,i] = self.D[:, i-1] +  np.random.normal(0, np.sqrt(t[2] - t[1])
-                                  , self.Dsize) - self.D[:,i-1] * (t[2] - t[1]) / (1 - t[i])
-                    
-            elif (D == 'gaussian_wavelets'):  
-                """ We build a dictionary from gaussian wavelets. We use a discretization on [-5,5]
-                and add two random parameters to get an interesting dictionary. 
-                The standard deviation sigma and a translationparameter K. The range of these 
-                parameters are fixed.
-                """
-                t = np.linspace(-5,5,len(self.time))
-                self.D = np.zeros((self.Dsize,len(self.time)))
-                for i in range(self.Dsize):
-                    sigma = np.random.uniform(0.2,1)
-                    K = np.random.uniform(-4,4)
-                    for l in range(len(self.time)):
-                        self.D[i,l] = (-(2 / (np.power(np.pi,0.25) * np.sqrt(3 * sigma)) ) 
-                                 * ((t[l] - K) ** 2 / (sigma ** 2) -1) * (
-                                 np.exp(-(t[l] - K) ** 2 / (2 * sigma ** 2))))
-                        
-            elif (D == 'Dyadic_indicator'):
+           
+            if (D == 'Dyadic_indicator'):
                 """ We build a dictionary from the basis of the Haar wavelets using 
                 only the father wavelets. We use a discretization on [0,1] since 
                 we are interested only in the shape.
@@ -249,9 +205,9 @@ class FIForest(object):
                     J_max = 7
                 a =0
                 t = np.linspace(0,1,len(self.time))
-                self.D = np.zeros((np.sum(np.power(2,np.arange(J_max))),len(self.time)))
+                self.D = np.zeros((np.sum(np.power(2, np.arange(J_max))), len(self.time)))
                 for J in range(J_max):
-                    b = np.power(2,J)
+                    b = np.power(2, J)
                     for k in range(b):
                         for l in range(len(self.time)):
                             x = b * t[l] - k
@@ -266,8 +222,8 @@ class FIForest(object):
                 if (J_max == None):
                     J_max = 7
                 a =0
-                t = np.linspace(0,1,len(self.time))
-                self.D = np.zeros((np.sum(np.power(2,np.arange(J_max))),len(self.time)))
+                t = np.linspace(0, 1, len(self.time))
+                self.D = np.zeros((np.sum(np.power(2, np.arange(J_max))), len(self.time)))
                 for J in range(J_max):
                     b = np.power(2,J)
                     for k in range(b):
@@ -275,92 +231,47 @@ class FIForest(object):
                             x = b * t[l] - k
                             self.D[a,l] = t[l] * (0 <= x < 1)
                         a += 1
-                        
-            elif (D == 'linear_indicator_uniform'):
-                """ 
-                """
-                self.D = np.zeros((self.Dsize,len(self.time)))
-                
-
-                for i in range(self.Dsize):
-                    a = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
-                    b = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
-                    for j in range(len(self.time)):
-                        self.D[i,j] = self.time[j] * (b > self.time[j] > a)
-                        
-                        
-            elif (D == 'indicator_uniform'):
-                """ 
-                """
-                self.D = np.zeros((self.Dsize,len(self.time)))
-
-                for i in range(self.Dsize):
-                    a = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
-                    b = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
-                    for j in range(len(self.time)):
-                        self.D[i,j] = 1. * (b > self.time[j] > a)
 
             elif(D == 'Self_local'):
                 """
                 """
-                self.D = np.zeros((self.Dsize,len(self.time)))
+                self.D = np.zeros((self.Dsize, len(self.time)))
                 for i in range(self.Dsize):
-                    a = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
-                    b = (self.time[len(self.time)-1]-self.time[0]) * np.random.random() + self.time[0]
+                    a = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
+                    b = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
                     for j in range(len(self.time)):
-                        k = np.random.randint(low = 0, high = X.shape[0], size = 1)
-                        self.D[i,j] = self.X.copy()[k,j] * (b > self.time[j] > a)
-            elif ( D == 'Self'):
-                self.D = self.X.copy()
-                
-            elif (D == 'cosinus'):
-                """ We build a cosinus dictionary with random amplitudes and frequences.
-                Amplitudes are fixed by the user while freq are fixed by the algorithm 
-                with a large range to avoid overloading parameters.
-                """
-                if (amplitude_min == None):
-                    amplitude_min = -1
-                    
-                if (amplitude_max == None):
-                    amplitude_max = 1
-                    
-                t = np.linspace(0,1,len(self.time))
-                self.D = np.zeros((self.Dsize,len(self.time)))
-                for i in range(self.Dsize):
-                    freq = np.random.uniform(0, 10, 1)
-                    amp = np.random.uniform(amplitude_min, amplitude_max, 1)
-                    self.D[i,:] = amp * np.cos(2 * np.pi * freq * t)
+                        k = np.random.randint(low=0, high=X.shape[0], size=1)
+                        self.D[i,j] = self.X.copy()[k,j] * (np.maximum(a, b) > self.time[j] > np.minimum(a, b))
 
-            else: raise TypeError('This Dictionary is not pre-defined')
-        else: self.D = D 
- 
-                
+            elif (D == 'Self'):
+                self.D = self.X.copy()
 
         self.alpha = alpha
         self.step = np.diff(self.time)
-        self.deriv_dictionary = None
+
+        if (type(D) == str):
+
+            if (D == 'Self_local' or D == 'Self'):
+                self.deriv_dictionary = derivate(self.D, self.step)
+
+            elif(D == 'Multiresolution_linear' or D == 'Dyadic_indicator'):
+                self.deriv_dictionary = derivate_piecewise(self.D, self.step)
+
+            else: self.deriv_dictionary = []
+
         self.deriv_X = None
+
         if not callable(innerproduct):
             """ Some inner product implemented.
             """
             if (innerproduct == 'auto'):
                 
                 if (self.alpha == None):
-                    self.alpha =1
+                    self.alpha = 1
                 
                 if (self.alpha == 0):
                     self.deriv_X = derivate(self.X, self.step)
-                    if (type(D) == str):
-                        if (D == 'linear_indicator_uniform' or D == 'Multiresolution_linear'):
-                            self.deriv_dictionary = derivate_piecewise(self.D, self.step)
-                            
-                        else:
-                            self.deriv_dictionary = derivate(self.D, self.step)
-                            self.deriv_X = derivate(self.X, self.step)
-                    else:
-                            self.deriv_dictionary = derivate(self.D, self.step)
-                            self.deriv_X = derivate(self.X, self.step)
-                            
+
                     def innerproduct(x, y, xderiv, yderiv):
                         """We build the inner product in the paper with alpha = 0 which corresponds 
                         to L2 of derivate dot product.
@@ -378,7 +289,7 @@ class FIForest(object):
                                                           * (F21 + F22) / 2)))
 
                 elif (self.alpha == 1):
-                    def innerproduct(x, y, xderiv = None, yderiv = None ):
+                    def innerproduct(x, y, xderiv=None, yderiv=None ):
                         """We build the inner product in the paper with alpha = 1 which corresponds 
                         to L2 dot product.
                         """ 
@@ -389,17 +300,6 @@ class FIForest(object):
                     
                 else:
                     self.deriv_X = derivate(self.X, self.step)
-                    if (type(D) == str):
-                        if (D == 'linear_indicator_uniform' or D == 'Multiresolution_linear'):
-                            self.deriv_dictionary = derivate_piecewise(self.D, self.step)
-                        
-                        else:
-                            self.deriv_dictionary = derivate(self.D, self.step)
-                            self.deriv_X = derivate(self.X, self.step)
-                    else:
-                            self.deriv_dictionary = derivate(self.D, self.step)
-                            self.deriv_X = derivate(self.X, self.step)
-
                     def innerproduct(x, y, xderiv, yderiv):
                         """We build the inner product in the paper which is a compromise between 
                         L2 scalar product and the L2 scalar product of derivate.
@@ -409,21 +309,21 @@ class FIForest(object):
                         F1 = x * y
                         F2 = xderiv * yderiv
                         
-                        F11 = F1[((np.arange(len(F1)) + 1) % len(F1))[:len(F1)-1]]
-                        F12 = F1[((np.arange(len(F1)) + -1) % len(F1))[1:len(F1)]]
-                        F21 = F2[((np.arange(len(F2)) + 1) % len(F2))[:len(F2)-1]]
-                        F22 = F2[((np.arange(len(F2)) + -1) % len(F2))[1:len(F2)]]
+                        F11 = F1[((np.arange(len(F1)) + 1) % len(F1))[:len(F1) - 1]]
+                        F12 = F1[((np.arange(len(F1)) - 1) % len(F1))[1:len(F1)]]
+                        F21 = F2[((np.arange(len(F2)) + 1) % len(F2))[:len(F2) - 1]]
+                        F22 = F2[((np.arange(len(F2)) - 1) % len(F2))[1:len(F2)]]
                         
-                        x11 = x[((np.arange(len(x)) + 1) % len(x))[:len(x)-1]]
-                        x12 = x[((np.arange(len(x)) + -1) % len(x))[1:len(x)]]
-                        x21 = xderiv[((np.arange(len(xderiv)) + 1) % len(xderiv))[:len(xderiv)-1]]
-                        x22 = xderiv[((np.arange(len(xderiv)) + -1) % len(xderiv))[1:len(xderiv)]]
+                        x11 = x[((np.arange(len(x)) + 1) % len(x))[:len(x) - 1]]
+                        x12 = x[((np.arange(len(x)) - 1) % len(x))[1:len(x)]]
+                        x21 = xderiv[((np.arange(len(xderiv)) + 1) % len(xderiv))[:len(xderiv) - 1]]
+                        x22 = xderiv[((np.arange(len(xderiv)) - 1) % len(xderiv))[1:len(xderiv)]]
                         
-                        y11 = y[((np.arange(len(y)) + 1) % len(y))[:len(y)-1]]
-                        y12 = y[((np.arange(len(y)) + -1) % len(y))[1:len(y)]]
-                        y21 = yderiv[((np.arange(len(yderiv)) + 1) % len(yderiv))[:len(yderiv)-1]]
-                        y22 = yderiv[((np.arange(len(yderiv)) + -1) % len(yderiv))[1:len(yderiv)]]
-                        return (self.alpha * np.sum(F11 + F12) / (np.sqrt(np.sum(x11 ** 2 + x12 ** 2)) * np.sqrt(np.sum(y11**2 + y12**2)))
+                        y11 = y[((np.arange(len(y)) + 1) % len(y))[:len(y) - 1]]
+                        y12 = y[((np.arange(len(y)) - 1) % len(y))[1:len(y)]]
+                        y21 = yderiv[((np.arange(len(yderiv)) + 1) % len(yderiv))[:len(yderiv) - 1]]
+                        y22 = yderiv[((np.arange(len(yderiv)) - 1) % len(yderiv))[1:len(yderiv)]]
+                        return (self.alpha * np.sum(F11 + F12) / (np.sqrt(np.sum(x11 ** 2 + x12 ** 2)) * np.sqrt(np.sum(y11 ** 2 + y12 ** 2)))
                                + (1 - self.alpha) * np.sum(F21 + F22) / (np.sqrt(np.sum(x21 ** 2 + 
                                 x22 ** 2)) * np.sqrt(np.sum(y21 ** 2 + y22 ** 2))))
                         
@@ -442,34 +342,32 @@ class FIForest(object):
             """ 
             self.limit = int(np.ceil(np.log2(self.sample))) 
             
-        
 
-        
         if (self.alpha == 1):
             for i in range(self.ntrees): 
-                """This loop builds an ensemble of iTrees (the forest).
+                """This loop builds an ensemble of f-itrees (the forest).
                 """
-                ix = np.random.choice(np.arange(self.nobjs), size = self.sample, replace = False)
+                ix = np.random.choice(np.arange(self.nobjs), size=self.sample, replace=False)
                 
-                self.Trees.append(iTree(X[ix], self.step,  
+                self.Trees.append(iTree(X[ix], self.time, self.step,  
                                         0, self.limit, 
                                         self.D, self.innerproduct, 
                                         self.alpha, self.deriv_X, 
-                                        self.deriv_dictionary, self.sample, self.criterion))
+                                        None, self.sample, self.criterion, self.mean, self.sd))
         else:
             for i in range(self.ntrees): 
-                """This loop builds an ensemble of iTrees (the forest).
+                """This loop builds an ensemble of f-itrees (the forest).
                 """
-                ix = np.random.choice(np.arange(self.nobjs), size = self.sample, replace = False)
+                ix = np.random.choice(np.arange(self.nobjs), size=self.sample, replace=False)
                 
-                self.Trees.append(iTree(X[ix], self.step, 
+                self.Trees.append(iTree(X[ix], self.time, self.step, 
                                         0, self.limit, 
                                         self.D, self.innerproduct, 
                                         self.alpha, self.deriv_X[ix], 
-                                        self.deriv_dictionary, self.sample, self.criterion))
+                                        self.deriv_dictionary, self.sample, self.criterion, self.mean, self.sd))
 
 
-    def compute_paths(self, X_in = None):
+    def compute_paths(self, X_in=None):
         """
         compute_paths(X_in = None) 
 
@@ -492,6 +390,7 @@ class FIForest(object):
         else: 
             if(self.alpha != 1):
                 deriv_X_in = derivate(X_in, self.step)
+
         S = np.zeros(len(X_in))
         
         for i in  range(len(X_in)):
@@ -513,7 +412,7 @@ class FIForest(object):
              # Anomaly Score
             S[i] = 2.0 ** (- Eh / self.c)                                           
         return S
-    def threshold(self, score_samples, contamination = 0.1):
+    def threshold(self, score_samples, contamination=0.1):
         """Compute the treshold to declare curves as anomalies or not.
            The choice of 'lower' interpolation in the percentile function come from
            the fact that it should be a little gap between the score of anomalies and the normal score. 
@@ -531,9 +430,9 @@ class FIForest(object):
             on the decision function.
             
         """
-        return np.percentile(score_samples, 100 * (1 - contamination), interpolation = 'lower')
+        return np.percentile(score_samples, 100 * (1 - contamination), interpolation='lower')
     
-    def predict_label(self, score, contamination = 0.1):
+    def predict_label(self, score, contamination=0.1):
          
         """Compute the label vector of curves.  
         
@@ -682,7 +581,8 @@ class iTree(object):
     """
 
     def __init__(self, 
-                 X, 
+                 X,
+                 time, 
                  step, 
                  e, 
                  l, 
@@ -692,11 +592,14 @@ class iTree(object):
                  deriv_X=None, 
                  deriv_dictionary=None,
                  subsample_size=None,
-                 criterion=None):
+                 criterion=None,
+                 mean=None,
+                 sd=None):
         
         self.e = e
         self.X = X
         self.step = step
+        self.time = time
         self.size = len(X)
         self.dim = self.X.shape[1]
         self.l = l
@@ -708,8 +611,14 @@ class iTree(object):
         self.innerproduct = innerproduct
         self.alpha = alpha
         self.deriv_X = deriv_X
+        self.mean = mean
+        self.sd = sd
+
         self.deriv_dictionary = deriv_dictionary
-        self.IF = np.zeros((self.D.shape[0])) 
+
+        if (type(self.D) != str):
+            self.IF = np.zeros((self.D.shape[0])) 
+
         self.subsample_size = subsample_size
         self.criterion = criterion
         # At each node create a new tree, starting with root node.
@@ -740,41 +649,145 @@ class iTree(object):
             left = None
             right = None
             self.exnodes += 1
-            return Node(X, self.d, self.dd, self.q, e, left, right, node_type = 'exNode')
+            return Node(X, self.d, self.dd, self.q, e, left, right, node_type='exNode')
         
         # Building the tree continues. All these nodes are internal.
-        else:     
-                                                                         
+        else:
             sample_size = X.shape[0] 
-            idx = np.random.choice(np.arange((self.D).shape[0]), size=1)
-            self.d = self.D[idx[0],:]
-            self.dd = idx[0]
+            t = np.linspace(0,1,len(self.step)+1)
+
+            if (type(self.D) != str):
+                # For finite dictionaries, we draw direction from them.
+                idx = np.random.choice(np.arange((self.D).shape[0]), size=1)
+                self.d = self.D[idx[0],:]
+                self.dd = idx[0]
+
+
+
+            elif (self.D == 'cosinus'):
+                """ We draw directions from the cosinus dictionary defined in the paper
+                 (with random amplitudes and frequences).
+                """
+
+                self.d =  np.random.uniform(-1, 1, 1) * np.cos(2 * np.pi * np.random.uniform(0, 10, 1) * t)
+                if (self.alpha != 1):
+                    self.deriv_dictionary.append(np.diff(self.d) / self.step)
+                    self.dd = len(self.deriv_dictionary) - 1
+
+            elif (self.D == 'Brownian'):
+                """ We draw directions from the Brownian motion dictionary defined in the paper"""
+
+                                                                         
+                if (self.mean == None):
+                    self.mean = 0
+                
+                if (self.sd == None):
+                    self.sd = 1
+                    
+                self.d = np.zeros((len(t)))
+                self.d[0] = np.random.normal(self.mean, scale=self.sd , size=1) 
+                for i in range(1,len(t)):
+                    self.d[i] += self.sd * np.random.normal(0, scale=np.sqrt(t[2] - t[1])
+                                                                , size=1) + self.mean * (t[2] - t[1])
+                if (self.alpha != 1):
+                    self.deriv_dictionary.append(np.diff(self.d) / self.step)
+                    self.dd = len(self.deriv_dictionary) - 1 
+
+            elif (self.D == 'gaussian_wavelets'):
+                """ We draw directions from the gaussian wavelets dictionary.
+                 We use a discretization on [-5,5] and add two random parameters 
+                 to get an interesting dictionary. 
+                The standard deviation sigma and a translation parameter K. The range of these 
+                parameters are fixed.
+                """
+
+                t = np.linspace(-5,5,len(self.step)+1)
+                sigma = np.random.uniform(0.2,1)
+                K = np.random.uniform(-4,4)
+                self.d = (-(2 / (np.power(np.pi,0.25) * np.sqrt(3 * sigma)) ) 
+                             * ((t - K) ** 2 / (sigma ** 2) -1) * (
+                             np.exp(-(t - K) ** 2 / (2 * sigma ** 2))))
+                if (self.alpha != 1):
+                    self.deriv_dictionary.append(np.diff(self.d) / self.step)
+                    self.dd = len(self.deriv_dictionary) - 1 
+
+            elif (self.D == 'Brownian_bridge'):
+                """ We draw directions from the Brownian bridge dictionary defined in the paper"""
+
+                self.d = np.zeros((len(t)))
+                for i in range(1,(len(t)-1)):
+                    self.d[i] +=  np.random.normal(0, np.sqrt(t[2] - t[1])
+                                  , size=1) - self.d[i-1] * (t[2] - t[1]) / (1 - t[i])
+
+                if (self.alpha != 1):
+                    self.deriv_dictionary.append(np.diff(self.d) / self.step)
+                    self.dd = len(self.deriv_dictionary) - 1 
+
+
+            elif (self.D == 'indicator_uniform'):
+                """ We draw directions from the indicator uniform dictionary defined in the paper"""
+
+                self.d = np.zeros((len(t)))
+                a = ((self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0])
+                b = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
+                for j in range(len(self.time)):
+                    self.d[j] = 1. * (np.maximum(a, b) > self.time[j] > np.minimum(a, b))
+
+
+            elif (self.D == 'linear_indicator_uniform'):
+                """ We draw directions from the Linear indicator uniform dictionary defined in the paper"""
+
+
+                self.d = np.zeros((len(t)))
+                a = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
+                b = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
+                for j in range(len(self.time)):
+                    self.d[j] = self.time[j] * (np.maximum(a,b) > self.time[j] > np.minimum(a,b))
+
+                if (self.alpha != 1):
+                    self.deriv_dictionary.append(np.diff(self.d) / self.step)
+                    self.dd = len(self.deriv_dictionary) - 1 
+
+            else: raise TypeError('This Dictionary is not pre-defined')
+    
+
+
+           
+
+
+
+
             Z = np.zeros((sample_size))
 
             if (self.alpha != 1):
                 for i in range(sample_size):
-                        Z[i] = self.innerproduct(X[i,:], self.d, self.deriv_X[i], 
-                                                 self.deriv_dictionary[idx[0]] )
-      
+
+
+                    Z[i] = self.innerproduct(X[i,:], self.d, self.deriv_X[i], 
+                                                  self.deriv_dictionary[self.dd])
+            
             else: 
                 for i in range(sample_size): 
-                        Z[i] = self.innerproduct(X[i,:], self.d)
+                    Z[i] = self.innerproduct(X[i,:], self.d)
                     
             # Picking a random threshold for the hyperplane splitting data.
-            #print(np.min(Z))
-            self.q = np.random.uniform(np.min(Z), np.max(Z)) 
-            # Criteria that determines if a curve should go to the left or right child node.
-            w = Z - self.q < 0
-            
-            if (sample_size >2):
-                if (np.sum(w) == 1 or np.sum(w) == sample_size - 1): 
-                    if (self.criterion == "naive"):
-                        self.IF[idx[0]] += 1
-                    elif(self.criterion == "sample"):
-                        self.IF[idx[0]] += sample_size / self.subsample_size 
 
-                    else:
-                        self.IF[idx[0]] += 1 / (e + 1) 
+            self.q = np.random.uniform(np.min(Z), np.max(Z)) 
+
+            # Criteria that determines if a curve should go to the left or right child node.
+
+            w = Z - self.q < 0
+
+            if (type(self.D) != str):
+                if (sample_size >2):
+                    if (np.sum(w) == 1 or np.sum(w) == sample_size - 1): 
+                        if (self.criterion == "naive"):
+                            self.IF[idx[0]] += 1
+                        elif(self.criterion == "sample"):
+                            self.IF[idx[0]] += sample_size / self.subsample_size 
+
+                        else:
+                            self.IF[idx[0]] += 1 / (e + 1) 
 
 
             return Node(self.X, self.d, self.dd, self.q, e,\

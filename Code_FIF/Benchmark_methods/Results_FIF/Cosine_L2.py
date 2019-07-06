@@ -7,6 +7,11 @@ import csv
 import pandas as pd
 from FIF import *
 from multiprocessing import Pool
+import os
+
+#######################################
+os.chdir('../../Datasets')
+#######################################
 
 
 
@@ -152,7 +157,7 @@ def bench5(l):
 	times = np.linspace(0,1,l[0].shape[1])
 	psi = np.min(np.array((l[0].shape[0], 256)))
 	F = FIForest(l[0], ntrees=100, time = times, subsample_size= psi,
-	 D= 'cosinus', innerproduct= "auto", Dsize = 1000, alpha = 1)
+	 D= 'cosinus', innerproduct= "auto", alpha = 1)
 	score5 = F.compute_paths(X_in = l[1])
 	return	score5 
 
@@ -164,7 +169,7 @@ if __name__ == '__main__': # excute on main process only
 
 
 
-	
+os.chdir('../Benchmark_methods/Results_FIF')	
 
 with open("Results_Cosine_L2.csv", "w") as f_write:
     writer = csv.writer(f_write)

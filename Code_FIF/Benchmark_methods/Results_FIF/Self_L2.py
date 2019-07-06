@@ -8,6 +8,11 @@ import csv
 import pandas as pd
 from FIF import *
 from multiprocessing import Pool
+import os
+
+#######################################
+os.chdir('../../Datasets')
+#######################################
 
 
 chinatown = pd.read_csv('China_Train.csv', header = None)
@@ -152,7 +157,7 @@ def benchself2(l):
 	times = np.linspace(0,1,l[0].shape[1])
 	psi = np.min(np.array((l[0].shape[0], 256)))
 	F = FIForest(l[0], ntrees=100, time = times, subsample_size= psi,
-	 D= l[0], innerproduct= "auto", Dsize = 1000, alpha = 1)
+	 D= l[0], innerproduct= "auto", alpha = 1)
 	score_self2 = F.compute_paths(X_in = l[1])
 	return	score_self2 
 
@@ -163,7 +168,7 @@ if __name__ == '__main__': # excute on main process only
 
 
 
-
+os.chdir('../Benchmark_methods/Results_FIF')	
 	
 
 with open("Results_Self_L2.csv", "w") as f_write:
