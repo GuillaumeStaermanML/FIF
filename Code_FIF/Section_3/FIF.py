@@ -360,11 +360,13 @@ class FIForest(object):
                 """
                 ix = np.random.choice(np.arange(self.nobjs), size=self.sample, replace=False)
                 
+                
                 self.Trees.append(iTree(X[ix], self.time, self.step, 
                                         0, self.limit, 
                                         self.D, self.innerproduct, 
                                         self.alpha, self.deriv_X[ix], 
                                         self.deriv_dictionary, self.sample, self.criterion, self.mean, self.sd))
+                
 
 
     def compute_paths(self, X_in=None):
@@ -412,6 +414,7 @@ class FIForest(object):
              # Anomaly Score
             S[i] = 2.0 ** (- Eh / self.c)                                           
         return S
+
     def threshold(self, score_samples, contamination=0.1):
         """Compute the treshold to declare curves as anomalies or not.
            The choice of 'lower' interpolation in the percentile function come from
@@ -465,6 +468,33 @@ class FIForest(object):
     
 
         return IF
+
+    def get_Dictionary_information(self):
+
+        Dic = []        
+        IF = []
+
+        if (self.D == 'cosinus' or self.D == 'gaussian_wavelets'):
+            Param = []
+
+            for i in range(self.ntrees):
+                for j in range(len(self.Trees[i].Dictionary)):
+                    Dic.append(self.Trees[i].Dictionary[j][0])
+                    Param.append(self.Trees[i].Dictionary[j][4])
+                    IF.append(self.Trees[i].Dictionary[j][2])
+            
+
+
+            return Dic, Param, IF
+
+        else: 
+
+            for i in range(self.ntrees):
+                for j in range(len(self.Trees[i].Dictionary)):
+                    Dic.append(self.Trees[i].Dictionary[j][0])
+                    IF.append(self.Trees[i].Dictionary[j][2])   
+
+            return Dic, IF
 
 
 
@@ -613,11 +643,13 @@ class iTree(object):
         self.deriv_X = deriv_X
         self.mean = mean
         self.sd = sd
+        self.Dictionary = []
 
         self.deriv_dictionary = deriv_dictionary
 
         if (type(self.D) != str):
-            self.IF = np.zeros((self.D.shape[0])) 
+            self.IF = np.zeros((self.D.shape[0]))
+        else: self.IF = [] 
 
         self.subsample_size = subsample_size
         self.criterion = criterion
@@ -668,8 +700,12 @@ class iTree(object):
                 """ We draw directions from the cosinus dictionary defined in the paper
                  (with random amplitudes and frequences).
                 """
+                a = np.random.uniform(-1, 1, 1)
+                b = np.random.uniform(0, 10, 1)
+                self.d = a  * np.cos(2 * np.pi * b * t)
 
-                self.d =  np.random.uniform(-1, 1, 1) * np.cos(2 * np.pi * np.random.uniform(0, 10, 1) * t)
+                info  = [self.d, 'param:', np.array([a,b]), 'Index IF :']
+                
                 if (self.alpha != 1):
                     self.deriv_dictionary.append(np.diff(self.d) / self.step)
                     self.dd = len(self.deriv_dictionary) - 1
@@ -686,9 +722,16 @@ class iTree(object):
                     
                 self.d = np.zeros((len(t)))
                 self.d[0] = np.random.normal(self.mean, scale=self.sd , size=1) 
+
+                
+
+
                 for i in range(1,len(t)):
                     self.d[i] += self.sd * np.random.normal(0, scale=np.sqrt(t[2] - t[1])
                                                                 , size=1) + self.mean * (t[2] - t[1])
+
+                info  = [self.d, 'Index IF :']
+
                 if (self.alpha != 1):
                     self.deriv_dictionary.append(np.diff(self.d) / self.step)
                     self.dd = len(self.deriv_dictionary) - 1 
@@ -702,11 +745,14 @@ class iTree(object):
                 """
 
                 t = np.linspace(-5,5,len(self.step)+1)
-                sigma = np.random.uniform(0.2,1)
+                sigma = np.random.uniform(0.2,2)
                 K = np.random.uniform(-4,4)
                 self.d = (-(2 / (np.power(np.pi,0.25) * np.sqrt(3 * sigma)) ) 
                              * ((t - K) ** 2 / (sigma ** 2) -1) * (
                              np.exp(-(t - K) ** 2 / (2 * sigma ** 2))))
+
+                info  = [self.d, 'param:', np.array([K, sigma]), 'Index IF :']
+
                 if (self.alpha != 1):
                     self.deriv_dictionary.append(np.diff(self.d) / self.step)
                     self.dd = len(self.deriv_dictionary) - 1 
@@ -718,6 +764,8 @@ class iTree(object):
                 for i in range(1,(len(t)-1)):
                     self.d[i] +=  np.random.normal(0, np.sqrt(t[2] - t[1])
                                   , size=1) - self.d[i-1] * (t[2] - t[1]) / (1 - t[i])
+
+                info  = [self.d, 'Index IF :']
 
                 if (self.alpha != 1):
                     self.deriv_dictionary.append(np.diff(self.d) / self.step)
@@ -733,6 +781,8 @@ class iTree(object):
                 for j in range(len(self.time)):
                     self.d[j] = 1. * (np.maximum(a, b) > self.time[j] > np.minimum(a, b))
 
+                info  = [self.d, 'Index IF :']
+
 
             elif (self.D == 'linear_indicator_uniform'):
                 """ We draw directions from the Linear indicator uniform dictionary defined in the paper"""
@@ -743,6 +793,8 @@ class iTree(object):
                 b = (self.time[len(self.time) - 1] - self.time[0]) * np.random.random() + self.time[0]
                 for j in range(len(self.time)):
                     self.d[j] = self.time[j] * (np.maximum(a,b) > self.time[j] > np.minimum(a,b))
+
+                info  = [self.d, 'Index IF :']
 
                 if (self.alpha != 1):
                     self.deriv_dictionary.append(np.diff(self.d) / self.step)
@@ -778,16 +830,28 @@ class iTree(object):
 
             w = Z - self.q < 0
 
-            if (type(self.D) != str):
+            summ = np.sum(w)
+
+            info.append((np.maximum(summ, sample_size - summ) / np.minimum(summ, sample_size - summ)) * np.exp(-(e+1))) 
+
+            
+            '''
+            if (type(self.D) == str):
                 if (sample_size >2):
                     if (np.sum(w) == 1 or np.sum(w) == sample_size - 1): 
-                        if (self.criterion == "naive"):
-                            self.IF[idx[0]] += 1
-                        elif(self.criterion == "sample"):
-                            self.IF[idx[0]] += sample_size / self.subsample_size 
+                        info.append(sample_size / self.subsample_size )
+                    else: info.append(0)
+                        #if (self.criterion == "naive"):
+                            #self.IF[idx[0]] += 1
+                        #elif(self.criterion == "sample"):
+                            #self.IF[idx[0]] += sample_size / self.subsample_size 
 
-                        else:
-                            self.IF[idx[0]] += 1 / (e + 1) 
+                        #else:
+                            #self.IF[idx[0]] += 1 / (e + 1) 
+                else: info.append(0)
+            '''
+
+            self.Dictionary.append(info)
 
 
             return Node(self.X, self.d, self.dd, self.q, e,\
