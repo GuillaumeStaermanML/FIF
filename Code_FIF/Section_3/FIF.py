@@ -164,7 +164,11 @@ class FIForest(object):
                  mean=None, 
                  sd=None, 
                  J_max=None,  
-                 alpha=None):
+                 alpha=None,
+                 param1_min=None,
+                 param1_max=None,
+                 param2_min=None,
+                 param2_max=None):
       
         self.X = X
         self.nobjs = len(X)
@@ -174,6 +178,7 @@ class FIForest(object):
         self.mean = mean
         self.sd = sd
         self.D = D
+        self.OOB = []
 
 
         if (ntrees == None):
@@ -342,31 +347,51 @@ class FIForest(object):
             """ 
             self.limit = int(np.ceil(np.log2(self.sample))) 
             
+        self.Subsample_index = []
+        self.Subsample_index_complementary = []
 
         if (self.alpha == 1):
             for i in range(self.ntrees): 
                 """This loop builds an ensemble of f-itrees (the forest).
                 """
-                ix = np.random.choice(np.arange(self.nobjs), size=self.sample, replace=False)
+                ixx = np.random.choice(np.arange(self.nobjs), size=self.nobjs, replace=False)
+                
+                ix = ixx[:self.sample]
+
+                self.Subsample_index.append(ix)
+                self.Subsample_index_complementary.append(ixx[self.sample:])
+
                 
                 self.Trees.append(iTree(X[ix], self.time, self.step,  
-                                        0, self.limit, 
-                                        self.D, self.innerproduct, 
-                                        self.alpha, self.deriv_X, 
-                                        None, self.sample, self.criterion, self.mean, self.sd))
+                                            0, self.limit, 
+                                            self.D, self.innerproduct, 
+                                            self.alpha, self.deriv_X, 
+                                            None, self.sample, self.criterion,
+                                             self.mean, self.sd,param1_min,
+                                             param1_max, param2_min, param2_max))
+
         else:
             for i in range(self.ntrees): 
                 """This loop builds an ensemble of f-itrees (the forest).
                 """
-                ix = np.random.choice(np.arange(self.nobjs), size=self.sample, replace=False)
+                ixx = np.random.choice(np.arange(self.nobjs), size=self.nobjs, replace=False)
                 
+                ix = ixx[:self.sample]           
+                
+                self.Subsample_index.append(ix)
+                self.Subsample_index_complementary.append(ixx[self.sample:])
                 
                 self.Trees.append(iTree(X[ix], self.time, self.step, 
-                                        0, self.limit, 
-                                        self.D, self.innerproduct, 
-                                        self.alpha, self.deriv_X[ix], 
-                                        self.deriv_dictionary, self.sample, self.criterion, self.mean, self.sd))
-                
+                                            0, self.limit, 
+                                            self.D, self.innerproduct, 
+                                            self.alpha, self.deriv_X[ix], 
+                                            self.deriv_dictionary, 
+                                            self.sample, self.criterion, 
+                                            self.mean, self.sd, param1_min=param1_min,
+                                             param1_max=param1_max, param2_min=param2_min,
+                                             param2_max=param2_max))
+
+                    
 
 
     def compute_paths(self, X_in=None):
@@ -495,6 +520,93 @@ class FIForest(object):
                     IF.append(self.Trees[i].Dictionary[j][2])   
 
             return Dic, IF
+    def out_of_bag(self, liste1, liste2):
+
+        Score = np.zeros((len(liste1)-1,len(liste2)-1))
+        for j in range(len(liste1)-1):
+            for k in range(len(liste2)-1):
+
+                if (self.alpha == 1):
+                    for i in range(self.ntrees): 
+                        """This loop builds an ensemble of f-itrees (the forest).
+                        """
+                        # We build the same forest without the region direction choosen,
+                        # we do this for each region. We then have 
+                        #ntrees * (len(liste1)-1) * (len(liste2)-1) trees
+
+                        self.OOB.append(iTree(self.X[self.Subsample_index[i]], 
+                                                    self.time, self.step,  
+                                                    0, self.limit, 
+                                                    self.D, self.innerproduct, 
+                                                    self.alpha, self.deriv_X, 
+                                                    None, self.sample, self.criterion,
+                                                     self.mean, self.sd, 
+                                                     oob_param1_min=liste1[j],
+                                                     oob_param1_max=liste1[j+1],
+                                                     oob_param2_min=liste2[k],
+                                                     oob_param2_max=liste2[k+1]))
+
+
+                        if(self.alpha != 1):
+                            deriv_X_in = derivate(self.X[self.Subsample_index_complementary[i]], 
+                                                    self.step)
+                        n0 = len(self.X[self.Subsample_index_complementary[i]])
+
+                        S = np.zeros(n0)
+                        
+
+                        for l in  range(n0):
+                            
+                            
+                            # Compute path length for each curve
+                            if(self.alpha != 1):
+                                S[l] = np.absolute(PathFactor(self.X[self.Subsample_index_complementary[i][l]], self.step, 
+                                                     self.Trees[i], self.alpha,
+                                                     deriv_X_in[l]).path * 1.0 -  PathFactor(self.X[self.Subsample_index_complementary[i][l]], self.step, 
+                                                     self.OOB[len(self.OOB)-1], self.alpha, deriv_X_in[l]).path * 1.0 )
+                            else:
+                                #print(len(self.Trees))
+                                #print(len(self.OOB))
+                                #print(S[l])
+                                S[l] = np.absolute(PathFactor(self.X[self.Subsample_index_complementary[i][l]], self.step, 
+                                                     self.Trees[i], self.alpha).path * 1.0 -  PathFactor(self.X[self.Subsample_index_complementary[i][l]], self.step, 
+                                                     self.OOB[len(self.OOB)-1], self.alpha).path * 1.0  )
+                            
+                            
+                        Score[j, k] += np.mean(S)
+                    Score[j, k] = Score[j, k] / self.ntrees 
+        return Score                   
+                                                                       
+                        
+
+
+
+
+
+
+
+
+"""   
+                else:
+                    for i in range(self.ntrees): 
+                        This loop builds an ensemble of f-itrees (the forest).
+                        
+                        
+                        self.OOB.append(iTree(X[self.Subsample_index[i]],
+                                                     self.time, self.step, 
+                                                    0, self.limit, 
+                                                    self.D, self.innerproduct, 
+                                                    self.alpha, self.deriv_X[ix], 
+                                                    self.deriv_dictionary, 
+                                                    self.sample, self.criterion, 
+                                                    self.mean, self.sd,
+                                                    oob_param1_min=liste1[j],
+                                                    oob_param1_max=liste1[j+1],
+                                                    oob_param2_min=liste2[k],
+                                                    oob_param2_max=liste2[k+1]))
+"""
+
+
 
 
 
@@ -624,7 +736,15 @@ class iTree(object):
                  subsample_size=None,
                  criterion=None,
                  mean=None,
-                 sd=None):
+                 sd=None,
+                 param1_min=None,
+                 param1_max=None,
+                 param2_min=None,
+                 param2_max=None,
+                 oob_param1_min=None,
+                 oob_param1_max=None,
+                 oob_param2_min=None,
+                 oob_param2_max=None):
         
         self.e = e
         self.X = X
@@ -653,6 +773,60 @@ class iTree(object):
 
         self.subsample_size = subsample_size
         self.criterion = criterion
+
+        
+        self.param1_min = param1_min
+        self.param1_max = param1_max
+        self.param2_min = param2_min
+        self.param2_max = param2_max
+
+        self.oob_param1_min = oob_param1_min
+        self.oob_param1_max = oob_param1_max
+        self.oob_param2_min = oob_param2_min
+        self.oob_param2_max = oob_param2_max
+
+
+
+        if oob_param1_min is None:
+                self.oob_param1_min = 0
+        if oob_param1_max is None:
+            self.oob_param1_max = 0
+
+        if oob_param2_min is None:
+            self.oob_param2_min = 0
+        if oob_param2_max is None:
+            self.oob_param2_max = 0
+
+
+
+        if (self.D == 'cosinus'):
+
+            if param1_min is None:
+                self.param1_min = -1
+            if param1_max is None:
+                self.param1_max = 1
+
+            if param2_min is None:
+                self.param2_min = 0
+            if param2_max is None:
+                self.param2_max = 10
+
+        elif (self.D == 'gaussian_wavelets'):
+            if param1_min is None:
+                self.param1_min = -4
+            if param1_max is None:
+                self.param1_max = 4
+
+            if param2_min is None:
+                self.param2_min = 0.2
+            if param2_max is None:
+                self.param2_max = 3
+
+
+
+
+
+
         # At each node create a new tree, starting with root node.
         self.root = self.make_tree(self.X, self.e)
         
@@ -700,8 +874,15 @@ class iTree(object):
                 """ We draw directions from the cosinus dictionary defined in the paper
                  (with random amplitudes and frequences).
                 """
-                a = np.random.uniform(-1, 1, 1)
-                b = np.random.uniform(0, 10, 1)
+                a = np.random.uniform(self.param1_min, self.param1_max, size=1)
+                b = np.random.uniform(self.param2_min, self.param2_max, size=1)
+
+                while (self.oob_param1_min < a < self.oob_param1_max):
+                    a = np.random.uniform(self.param1_min, self.param1_max, size=1)
+                while (self.oob_param2_min < b < self.oob_param2_max):
+                    b = np.random.uniform(self.param2_min, self.param2_max, size=1)
+
+
                 self.d = a  * np.cos(2 * np.pi * b * t)
 
                 info  = [self.d, 'param:', np.array([a,b]), 'Index IF :']
@@ -743,10 +924,16 @@ class iTree(object):
                 The standard deviation sigma and a translation parameter K. The range of these 
                 parameters are fixed.
                 """
+                K = np.random.uniform(self.param1_min, self.param1_max, size=1)
+                sigma = np.random.uniform(self.param2_min, self.param2_max, size=1)
+
+                while (self.oob_param1_min < K < self.oob_param1_max):
+                    K = np.random.uniform(self.param1_min, self.param1_max, size=1)
+                while (self.oob_param2_min < sigma < self.oob_param2_max):
+                    sigma = np.random.uniform(self.param2_min, self.param2_max, size=1)
 
                 t = np.linspace(-5,5,len(self.step)+1)
-                sigma = np.random.uniform(0.2,2)
-                K = np.random.uniform(-4,4)
+
                 self.d = (-(2 / (np.power(np.pi,0.25) * np.sqrt(3 * sigma)) ) 
                              * ((t - K) ** 2 / (sigma ** 2) -1) * (
                              np.exp(-(t - K) ** 2 / (2 * sigma ** 2))))
