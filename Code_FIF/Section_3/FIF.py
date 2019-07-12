@@ -1032,7 +1032,7 @@ class iTree(object):
 
             if (sample_size >2):
                 if (summ == 1 or summ == sample_size - 1):
-                    self.count += 1 #sample_size / self.subsample_size 
+                    self.count += 1  #sample_size / self.subsample_size 
 
             #info.append((np.maximum(summ, sample_size - summ) / np.minimum(summ, sample_size - summ)) * np.exp(-(e+1))) 
 
