@@ -83,15 +83,14 @@ And then use FIF to ranking functional dataset :
 .. code:: python
 
   np.random.seed(42)
-  F3  = FIForest(X, D="gaussian_wavelets", time=tps, innerproduct="auto", alpha=0.5)
-  S3  = F3.compute_paths()
+  F  = FIForest(X, D="gaussian_wavelets", time=tps, innerproduct="auto", alpha=0.5)
+  S  = F.compute_paths()
     
-S1 and S2 are the score of all functions in the dataset. S1 come from FIF with L2 scalar product while
-S2 come from FIF with L2 derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
+The simulated dataset with the five introduced anomalies (left). The sorted dataset (middle), the darker the color, the more the curves are considered anomalies. The sorted anomaly score of the dataset (right). 
 
-.. image:: anomaly_example.pdf
-.. image:: anomaly_example_rank.pdf
-.. image:: anomaly_example_score.pdf
+.. image:: anomaly_example.png
+.. image:: anomaly_example_rank.png
+.. image:: anomaly_example_score.png
 
 Dependencies
 ------------
