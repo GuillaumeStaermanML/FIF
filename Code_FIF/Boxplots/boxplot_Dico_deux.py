@@ -29,14 +29,14 @@ score111 = []
 score222 = []
 score333 = []
 score444 = []
-Dico = ["gaussian_wavelets", "Brownian", "cosinus", "Haar_wavelets_father", "indicator_uniform", "Brownian_bridge","Self"]
+Dico = ["gaussian_wavelets", "Brownian", "cosinus", "Dyadic_indicator", "indicator_uniform", "Brownian_bridge","Self"]
 
 
 def boucle(Dico):
     np.random.seed(42)
     for k in range(100):
         F = FIForest(X, ntrees=100, time = times, subsample_size= 64, 
-         D= Dico, innerproduct= "auto", Dsize = 1000, alpha = 1)
+         D= Dico, innerproduct= "auto",  alpha = 1)
         S = F.compute_paths()
         score111.append(S[0])
         score222.append(S[1])

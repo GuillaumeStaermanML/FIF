@@ -42,7 +42,7 @@ def boucleA(l):
         Y = simul_Brownien_Drift(n = l-4, m = 500, T = 1)
         Z = np.concatenate((X_ano,Y), axis = 0)
         F = FIForest(Z, ntrees=100, time = times, subsample_size= np.min(np.array([64, l])),
-         D= 'Haar_wavelets_father', innerproduct= "auto", Dsize = 1000, alpha = 1)
+         D= 'Dyadic_indicator', innerproduct= "auto",  alpha = 1)
         S = F.compute_paths()
         score10.append(S[0])
         score20.append(S[1])
