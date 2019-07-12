@@ -32,39 +32,66 @@ Quick Start :
 Create a toy dataset :
 
 .. code:: python
-   
-   import numpy as np
-   m =100
-   n =100
-   tps = np.linspace(0,1,m)
-   v = np.linspace(1,1.4,n)
-   X = np.zeros((n,m))
-   Y = np.zeros((10,m))
-   for i in range(n):
-       X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
-   for i in range(10):
-       for j in range(m):
-           if (tps[j]<0.2 or tps[j]>0.8):
-               Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 
-           else:
-               Y[i,j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.random.normal(0,0.3,1)
-   Y[:,0] = 0
-   Y[:,m-1] = 0
-   Z = np.concatenate((X,Y), axis = 0)
+
+
+  import numpy as np 
+  np.random.seed(42)
+  m =100
+  n =100
+  tps = np.linspace(0,1,m)
+  v = np.linspace(1,1.4,n)
+  X = np.zeros((n,m))
+  for i in range(n):
+      X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
+
+
+  Z1 = np.zeros((m))
+  for j in range(m):
+      if (tps[j]<0.2 or tps[j]>0.8):
+          Z1[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 
+      else:
+          Z1[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.random.normal(0,0.3,1)
+  Z1[0] = 0
+  Z1[m-1] = 0
+
+
+  Z2 = 30 * ((1-tps) ** 1.6) * tps ** 1.6
+
+
+  Z3 = np.zeros((m))
+  for j in range(m):
+      Z3[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.sin(2*np.pi*tps[j])
+
+  Z4 = np.zeros((m))
+  for j in range(m):
+      Z4[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2
+
+  for j in range(70,71):
+      Z4[j] += 2
+
+  Z5 = np.zeros((m))
+  for j in range(m):
+      Z5[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + 0.5*np.sin(10*np.pi*tps[j])
+
+  X = np.concatenate((X,Z1.reshape(1,-1),Z2.reshape(1,-1),  
+                       Z3.reshape(1,-1), Z4.reshape(1,-1), Z5.reshape(1,-1)), axis = 0)
+
+
    
 And then use FIF to ranking functional dataset :
 
 .. code:: python
 
-   F1  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=1)
-   S1  = F1.compute_paths()
-   F2  = FIForest(Z, D="Brownian", time=tps, innerproduct="auto", alpha=0)
-   S2  = F2.compute_paths()
+  np.random.seed(42)
+  F3  = FIForest(X, D="gaussian_wavelets", time=tps, innerproduct="auto", alpha=0.5)
+  S3  = F3.compute_paths()
     
 S1 and S2 are the score of all functions in the dataset. S1 come from FIF with L2 scalar product while
 S2 come from FIF with L2 derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
 
-.. image:: derive2.png
+.. image:: anomaly_example.pdf
+.. image:: anomaly_example_rank.pdf
+.. image:: anomaly_example_score.pdf
 
 Dependencies
 ------------
