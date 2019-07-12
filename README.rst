@@ -89,7 +89,9 @@ And then use FIF to ranking functional dataset :
 S1 and S2 are the score of all functions in the dataset. S1 come from FIF with L2 scalar product while
 S2 come from FIF with L2 derivate scalar product. Anomaly score increases from magenta to yellow in the left plot and decreases in the right plot.
 
-.. image:: anomaly_example_rank.pdf
+.. image:: anomaly_example.pdf
+           anomaly_example_rank.pdf
+           anomaly_example_score.pdf
 
 Dependencies
 ------------
