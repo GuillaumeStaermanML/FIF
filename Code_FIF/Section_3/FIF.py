@@ -1030,7 +1030,7 @@ class iTree(object):
 
             summ = np.sum(w)
 
-            if (sample_size >2):
+            if (sample_size >10):
                 if (summ == 1 or summ == sample_size - 1):
                     self.count += 1  #sample_size / self.subsample_size 
 
