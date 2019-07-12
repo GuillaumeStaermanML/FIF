@@ -82,6 +82,7 @@ And then use FIF to ranking functional dataset :
 
 .. code:: python
 
+  From FIF import *
   np.random.seed(42)
   F  = FIForest(X, D="gaussian_wavelets", time=tps, innerproduct="auto", alpha=0.5)
   S  = F.compute_paths()
