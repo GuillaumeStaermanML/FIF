@@ -38,7 +38,7 @@ def boucleHL(l):
     score4 = []
     for k in range(100):
         F = FIForest(X, ntrees=100, time = times, subsample_size= 64, limit = l,
-         D= 'Haar_wavelets_father', innerproduct= "auto", Dsize = 1000, alpha = 1)
+         D= 'Dyadic_indicator', innerproduct= "auto",  alpha = 1)
         S = F.compute_paths()
         score1.append(S[0])
         score2.append(S[1])

@@ -35,7 +35,7 @@ l = np.array([10, 20, 50, 100, 200, 500])
 def boucle(l):
     for k in range(100):
         F = FIForest(X, ntrees=l, time = times, subsample_size= 64, 
-        	D= 'gaussian_wavelets', innerproduct= "auto", Dsize = 1000, alpha = 1)
+        	D= 'gaussian_wavelets', innerproduct= "auto", alpha = 1)
         S = F.compute_paths()
         score1.append(S[0])
         score2.append(S[1])

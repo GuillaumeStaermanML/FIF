@@ -37,7 +37,7 @@ def boucle(Dico):
     np.random.seed(42)
     for k in range(100):
         F = FIForest(X, ntrees=100, time = times, subsample_size= 64, 
-         D= Dico, innerproduct= "auto", Dsize = 1000, alpha = 0)
+         D= Dico, innerproduct= "auto",  alpha = 0)
         S = F.compute_paths()
         score1111.append(S[0])
         score2222.append(S[1])

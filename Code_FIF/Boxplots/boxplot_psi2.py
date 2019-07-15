@@ -36,7 +36,7 @@ def boucle0(psi):
     score40 = []
     for k in range(100):
         F = FIForest(X0, ntrees=100, limit = 7 , time = times, subsample_size= psi,
-         D= 'gaussian_wavelets', innerproduct= "auto", Dsize = 1000, alpha = 1)
+         D= 'gaussian_wavelets', innerproduct= "auto",  alpha = 1)
         S = F.compute_paths()
         score10.append(S[0])
         score20.append(S[1])
