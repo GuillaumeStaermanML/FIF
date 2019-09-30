@@ -183,7 +183,7 @@ class FIForest(object):
         if (subsample_size == None):
             if (self.nobjs > 500):
                 self.sample = 256
-            else: self.sample = 64
+            else: self.sample = np.minimum(64, self.X.shape[0])
         else : self.sample = subsample_size
 
 
