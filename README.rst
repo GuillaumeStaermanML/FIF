@@ -106,9 +106,11 @@ Cite
 
 If you use this code in your project, please cite::
 
-   Functional Isolation Forest   
-   Guillaume Staerman, Pavlo Mozharovskyi, Stéphan Clémençon, Florence d'Alché-Buc. 
-   ACML, 2019.
-   https://arxiv.org/abs/1904.04573 
+   @InProceedings{staerman2019functional,
+    title={Functional Isolation Forest},
+    author={Guillaume Staerman and Pavlo Mozharovskyi and Stephan Cl\'emen\c con and Florence d'Alch\'e-Buc},
+    year={2019},
+    booktitle={Asian Conference of Machine Learning}
+    }
 
   
