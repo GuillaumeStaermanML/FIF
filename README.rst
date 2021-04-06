@@ -9,16 +9,12 @@ This repository hosts Python code of the Functional Isolation Forest algorithm. 
 
 Installation
 ------------
+Download this repository and then run this python command in the folder:
 
 .. code:: python
 
-   pip install fif
+   python setup.py build_ext --inplace
 
-or 
-
-.. code:: python
-
-   pip install git+https://github.com/guillaumeStaermanML/FIF.git
   
 Algorithm
 ---------
