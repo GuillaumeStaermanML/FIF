@@ -31,8 +31,8 @@ Some parameters have to be set by the user :
                                     - X [numpy array of size (n,dim)]: 'n' functional data with 'dim' measurements. 
                                     - time [numpy array of size dim]: vector of times measurements of size 'dim'.
                                     - sample_size [int]: the size of samples used for each tree.
-                                    - ntrees[int]: the number of trees, default value is 100.
-                                    - alpha[float between 0 and 1]: convex combination parameter for the innerproduct (as it is explained in the paper), default value is 1. 
+                                    - ntrees [int]: the number of trees, default value is 100.
+                                    - alpha [float between 0 and 1]: convex combination parameter for the innerproduct (as it is explained in the paper), default value is 1. 
                                     - dic_number [int: 0,1,2]: three dictionaries are implemented (0: Brownian motion; 1: Gaussian wavelets; 2: cosine), default value is 1.
                                                                    
 
