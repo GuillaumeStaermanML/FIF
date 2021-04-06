@@ -90,9 +90,9 @@ And then use FIF to ranking functional dataset :
 
 .. code:: python
 
-  From FIF import *
+  import fif as FIF
   np.random.seed(42)
-  F  = FIForest(X, D="gaussian_wavelets", time=tps, innerproduct="auto", alpha=0.5)
+  F  = FIF.FIForest(X, time, ntrees=100, sample_size=64, dic_number=1, alpha=0.5, seed=0)
   S  = F.compute_paths()
     
 The simulated dataset with the five introduced anomalies (top). The sorted dataset (middle), the darker the color, the more the curves are considered anomalies. The sorted anomaly score of the dataset (bottom). 
@@ -107,6 +107,7 @@ Dependencies
 These are the dependencies to use FIF:
 
 * numpy 
+* cython
 
 
 Cite
