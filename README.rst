@@ -98,7 +98,7 @@ And then use FIF to ranking functional dataset :
 The simulated dataset with the five introduced anomalies (top). The sorted dataset (middle), the darker the color, the more the curves are considered anomalies. The sorted anomaly score of the dataset (bottom). 
 
 .. image::  anomaly_example-1.png
-   :width: 400
+   :width: 100
 .. image:: anomaly_example_rank-1.png
 .. image:: anomaly_example_score-1.png
 
