@@ -1,7 +1,7 @@
 FIF : Functional Isolation Forest
 =========================================
 
-This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the python version. Three dictionaries are implemented, Brownian motion, gaussian wavelets and cosine, see the paper for more details. Feel free to suggests any dictionaries. 
+This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is extremly faster than the python version. Three dictionaries are implemented, Brownian motion, gaussian wavelets and cosine, see the paper for more details. Feel free to suggests any dictionaries. 
 
 
 =========================================
