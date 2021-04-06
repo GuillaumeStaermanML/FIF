@@ -13,11 +13,11 @@ Installation
 To get the latest version of the code::
 .. code:: python
 
-  $ pip install fif
+   pip install fif
 
 or 
 .. code:: python
-  $ git clone https://github.com/Gstaerman/FIF.git
+   git clone https://github.com/Gstaerman/FIF.git
   
 Algorithm
 ---------
