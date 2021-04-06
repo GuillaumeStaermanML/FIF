@@ -1,7 +1,7 @@
 FIF : Functional Isolation Forest
 =========================================
 
-This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the old version.
+This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the python version.
 
 
 =========================================
@@ -11,9 +11,12 @@ Installation
 ------------
 
 To get the latest version of the code::
+.. code:: python
+
   $ pip install fif
 
 or 
+.. code:: python
   $ git clone https://github.com/Gstaerman/FIF.git
   
 Algorithm
