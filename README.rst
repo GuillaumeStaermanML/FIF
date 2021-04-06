@@ -17,6 +17,7 @@ Installation
 or 
 
 .. code:: python
+
    pip install git+https://github.com/guillaumeStaermanML/FIF.git
   
 Algorithm
