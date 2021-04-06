@@ -14,7 +14,12 @@ Download this repository and then run this python command in the folder:
 .. code:: python
 
    python setup.py build_ext --inplace
+   
+then you can import the algorithm with
 
+.. code:: python
+
+   import fif as FIF
   
 Algorithm
 ---------
