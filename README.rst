@@ -1,7 +1,7 @@
 FIF : Functional Isolation Forest
 =========================================
 
-This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the python version.
+This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the python version. Three dictionaries are implemented, Brownian motion, gaussian wavelets and cosine, see the paper for more details. Feel free to suggests any dictionaries. 
 
 
 =========================================
@@ -10,18 +10,18 @@ This repository hosts Python code of the Functional Isolation Forest algorithm. 
 Installation
 ------------
 
-To get the latest version of the code::
 .. code:: python
 
    pip install fif
 
 or 
+
 .. code:: python
-   git clone https://github.com/Gstaerman/FIF.git
+   pip install git+https://github.com/guillaumeStaermanML/FIF.git
   
 Algorithm
 ---------
-Functional Isolation Forest is an anomaly detection (and anomaly ranking) algorithm for functional data.
+Functional Isolation Forest is an anomaly detection (and anomaly ranking) algorithm for functional data (i.e., time-series).
 It shows a great flexibility to distinguish most of anomaly types of functional data.
 
 Some parameters have to be set by the user : 
@@ -31,8 +31,7 @@ Some parameters have to be set by the user :
                                     - ntrees[int]: the number of trees, default value is 100.
                                     - alpha[float between 0 and 1]: convex combination parameter for the innerproduct (as it is explained in the paper), default value is 1. 
                                     - dic_number [int: 0,1,2]: three dictionaries are implemented (0: Brownian motion; 1: Gaussian wavelets; 2: cosine), default value is 1.
-                                    
-See the documentation of FIF.py to get more informations on innerproduct and dictionary possibilities.                                 
+                                                                   
 
 Quick Start :
 ------------
@@ -91,9 +90,8 @@ And then use FIF to ranking functional dataset :
 .. code:: python
 
   import fif as FIF
-  np.random.seed(42)
-  F  = FIF.FIForest(X, time, ntrees=100, sample_size=64, dic_number=1, alpha=0.5, seed=0)
-  S  = F.compute_paths()
+  F  = FIF.FIForest(X, time=tps, ntrees=100, sample_size=64, dic_number=1, alpha=0.5, seed=0)
+  Anomaly_score  = F.compute_paths()
     
 The simulated dataset with the five introduced anomalies (top). The sorted dataset (middle), the darker the color, the more the curves are considered anomalies. The sorted anomaly score of the dataset (bottom). 
 
