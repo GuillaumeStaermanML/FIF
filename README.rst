@@ -1,7 +1,7 @@
 FIF : Functional Isolation Forest
 =========================================
 
-This repository hosts Python code of the Functional Isolation Forest algorithms and its extension to Multivariate functional data. Here we provide the source code for the algorithms as well as example notebooks to help get started.
+This repository hosts Python code of the Functional Isolation Forest algorithm. Here we provide the source code using cython/c++ and the old version in python. The c++ code is highly inspired from the incredible work of https://github.com/sahandha/eif and is ~40x times faster than the old version.
 
 
 =========================================
@@ -11,7 +11,9 @@ Installation
 ------------
 
 To get the latest version of the code::
+  $ pip install fif
 
+or 
   $ git clone https://github.com/Gstaerman/FIF.git
   
 Algorithm
@@ -20,9 +22,12 @@ Functional Isolation Forest is an anomaly detection (and anomaly ranking) algori
 It shows a great flexibility to distinguish most of anomaly types of functional data.
 
 Some parameters have to be set by the user : 
-                                    - innerproduct (one can fix 'auto' and vary alpha parameter to play with FIF) 
-                                    - D (Dictionary)
-                                    - time (vector time of discretization points) 
+                                    - X [numpy array of size (n,dim)]
+                                    - time [numpy array of size dim]: vector time of discretization points.
+                                    - sample_size [int]: the size of samples used for each tree.
+                                    - ntrees[int]: the number of trees, default value is 100.
+                                    - alpha[float between 0 and 1]: convex combination parameter for the innerproduct (as it is explained in the paper), default value is 1. 
+                                    - dic_number [int: 0,1,2]: three dictionaries are implemented (0: Brownian motion; 1: Gaussian wavelets; 2: cosine), default value is 1.
                                     
 See the documentation of FIF.py to get more informations on innerproduct and dictionary possibilities.                                 
 
