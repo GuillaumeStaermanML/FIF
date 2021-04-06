@@ -25,9 +25,11 @@ Algorithm
 Functional Isolation Forest is an anomaly detection (and anomaly ranking) algorithm for functional data (i.e., time-series).
 It shows a great flexibility to distinguish most of anomaly types of functional data.
 
+The algorithm return the anomaly score of each sample with the function compute_paths(), see notebooks for example or the quick start below.
+
 Some parameters have to be set by the user : 
-                                    - X [numpy array of size (n,dim)]
-                                    - time [numpy array of size dim]: vector time of discretization points.
+                                    - X [numpy array of size (n,dim)]: 'n' functional data with 'dim' measurements. 
+                                    - time [numpy array of size dim]: vector of times measurements of size 'dim'.
                                     - sample_size [int]: the size of samples used for each tree.
                                     - ntrees[int]: the number of trees, default value is 100.
                                     - alpha[float between 0 and 1]: convex combination parameter for the innerproduct (as it is explained in the paper), default value is 1. 
@@ -44,15 +46,10 @@ Create a toy dataset :
 
   import numpy as np 
   np.random.seed(42)
-  m =100
-  n =100
-  tps = np.linspace(0,1,m)
-  v = np.linspace(1,1.4,n)
+  m =100;n =100;tps = np.linspace(0,1,m);v = np.linspace(1,1.4,n)
   X = np.zeros((n,m))
   for i in range(n):
       X[i] = 30 * ((1-tps) ** v[i]) * tps ** v[i]
-
-
   Z1 = np.zeros((m))
   for j in range(m):
       if (tps[j]<0.2 or tps[j]>0.8):
@@ -61,11 +58,7 @@ Create a toy dataset :
           Z1[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.random.normal(0,0.3,1)
   Z1[0] = 0
   Z1[m-1] = 0
-
-
   Z2 = 30 * ((1-tps) ** 1.6) * tps ** 1.6
-
-
   Z3 = np.zeros((m))
   for j in range(m):
       Z3[j] = 30 * ((1-tps[j]) ** 1.2) * tps[j] ** 1.2 + np.sin(2*np.pi*tps[j])
