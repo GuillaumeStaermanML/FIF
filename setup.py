@@ -23,7 +23,7 @@ library_dirs = []
 include_dirs = []
 exec(open('version.py').read())
 setup(
-    name='python-fif',
+    name='py-fif',
     version=__version__,
     author='Guillaume Staerman',
     author_email='guillaume.staerman@telecom-paris.fr',
@@ -41,5 +41,6 @@ setup(
     description='Functional Isolation Forest',
     long_description_content_type='text/markdown',
     url='https://github.com/GuillaumeStaermanML/FIF',
+    download_url='https://github.com/GuillaumeStaermanML/FIF/archive/refs/tags/1.0.1.tar.gz',
     install_requires=["numpy", "cython"],
 )
