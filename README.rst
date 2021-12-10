@@ -83,7 +83,7 @@ Create a toy dataset :
 
 
    
-And then use FIF to ranking functional dataset :
+And then use FIF to rank functional dataset :
 
 .. code:: python
 
@@ -111,11 +111,17 @@ Cite
 
 If you use this code in your project, please cite::
 
-   @InProceedings{staerman2019functional,
-    title={Functional Isolation Forest},
-    author={Guillaume Staerman and Pavlo Mozharovskyi and Stephan Cl\'emen\c con and Florence d'Alch\'e-Buc},
-    year={2019},
-    booktitle={Asian Conference of Machine Learning}
-    }
+
+@InProceedings{pmlr-v101-staerman19a,
+  title = 	 {Functional Isolation Forest},
+  author =       {Staerman, Guillaume and Mozharovskyi, Pavlo and Cl\'emen\c{c}on, Stephan and d'Alch\'e-Buc, Florence},
+  booktitle = 	 {Proceedings of The Eleventh Asian Conference on Machine Learning},
+  pages = 	 {332--347},
+  year = 	 {2019},
+  volume = 	 {101},
+  publisher =    {PMLR}
+
+}
+
 
   
