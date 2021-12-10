@@ -21,6 +21,9 @@ Further, you can import the algorithm with the following command in your python 
 
    import fif as FIF
   
+NB: our algorithm is not the one from https://pypi.org/project/fif/. Uninstall this package if you want to use functional isolation forest
+
+
 Algorithm
 ---------
 Functional Isolation Forest is an anomaly detection (and anomaly ranking) algorithm for functional data (i.e., time-series).
