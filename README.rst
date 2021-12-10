@@ -112,7 +112,7 @@ Cite
 If you use this code in your project, please cite::
 
 
-@InProceedings{pmlr-v101-staerman19a,
+   @InProceedings{pmlr-v101-staerman19a,
   title = 	 {Functional Isolation Forest},
   author =       {Staerman, Guillaume and Mozharovskyi, Pavlo and Cl\'emen\c{c}on, Stephan and d'Alch\'e-Buc, Florence},
   booktitle = 	 {Proceedings of The Eleventh Asian Conference on Machine Learning},
