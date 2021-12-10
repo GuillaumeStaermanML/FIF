@@ -120,8 +120,7 @@ If you use this code in your project, please cite::
   year = 	 {2019},
   volume = 	 {101},
   publisher =    {PMLR}
-
-}
+   }
 
 
   
