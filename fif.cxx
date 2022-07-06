@@ -73,14 +73,14 @@ inline std::vector<double> dictionary_function (int dim, int dic_number, RANDOM_
 		}
 	else if (dic_number == 2) // cosine with various frequencies and amplitude
 
-		{
-
-		for (int i=0; i<dim; i++)
-			{
-			double ampl = 0.0;
+		{	double ampl = 0.0;
 			double freq = 0.0;
 			ampl = std::uniform_real_distribution<double> (-1, 1)(random_engine_in);
 			freq = std::uniform_real_distribution<double> (0, 10)(random_engine_in);
+
+		for (int i=0; i<dim; i++)
+			{
+
 
 			dic_function[i] = ampl * std::cos(2 * PI_CONSTANT * freq * t[i]);
 			}
