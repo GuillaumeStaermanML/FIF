@@ -88,7 +88,7 @@ And then use FIF to rank functional dataset :
 .. code:: python
 
   import fif as FIF
-  F  = FIF.FIForest(X, time=tps, ntrees=100, sample_size=64, dic_number=1, alpha=0.5, seed=0)
+  F  = FIF.FiForest(X, time=tps, ntrees=100, sample_size=64, dic_number=1, alpha=0.5, seed=0)
   Anomaly_score  = F.compute_paths()
     
 The simulated dataset with the five introduced anomalies (top). The sorted dataset (middle), the darker the color, the more the curves are considered anomalies. The sorted anomaly score of the dataset (bottom). 
